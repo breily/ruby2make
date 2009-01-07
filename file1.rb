@@ -1,5 +1,3 @@
-## Brian Reily - bjr5e
-## 9/04/08
 #
 #CC=g++
 #FLAGS=-g #-O2
@@ -14,7 +12,7 @@
 #clean:
 #	rm hello *.o;
 
-variables :CC => "g++", :FLAGS => "-g"
+vars :CC => "g++", :FLAGS => "-g"
 
 rule "hello" do
     depend "hello.o"
