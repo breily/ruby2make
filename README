@@ -38,3 +38,30 @@ Use this script:
     clean "hello", "*.o"
  
 It's more readable, and it doesn't insanely require tabs and not spaces.
+
+Syntax
+------
+
+vars [hash] => Set Makefile macros (includes "gcc" as :CC and "" as :FLAGS)
+
+rule [name] [optional depends hash] [block] 
+    => Add a rule/target called name. If a hash like ':depends => "hello.o"'
+       or ':depends => ["hello.o", "hello.h"]' is present, then those items
+       are added as dependencies to the rule.
+
+depends [args]
+    => Add dependencies to a rule (must occure in rule declaration's block)
+
+compile [args]
+    => Without any args, uses '$(CC) $(FLAGS)' to compile the dependencies.
+       :input and :output specify specific files, and you can add a '-c' flag
+       with :to_obj. Must occur in a rule block.
+
+command [args]
+    => Add a custom line to a rule.
+
+echo [message]
+    => Shortcut to add an '@echo' command.
+
+clean [files]
+    => Shortcut to create a clean rule, with a '-rm' command for any [files].
