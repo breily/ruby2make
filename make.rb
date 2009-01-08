@@ -14,9 +14,17 @@ class Rule
         @dependencies << arg
     end
     def compile(params={})
-        puts "adding compile (#{params})"
+        # Why are there nils in @dependencies?
+        deps = @dependencies.find_all { |d| d.split('.').last != 'h' unless d.nil? }
+        params[:input] = deps if params[:input].nil?
+        params[:input] = params[:input].join " "
+        if params[:output].nil?
+            params[:output] = ""
+        else
+            params[:output] = "-o #{params[:output]}"
+        end
+        params[:flags] = params[:flags].join " "
         @compilations << params
-        puts
     end
     def command(arg)
         @commands << arg
@@ -27,23 +35,25 @@ class Makefile
     include Singleton
     attr_accessor :variables, :rules, :current_rule
     def initialize
-        @variables = { :CC => "gcc" }
+        @variables = { :CC => "gcc", :FLAGS => "" }
         @rules = []
         @current_rule = nil
     end
     def status
-        puts
-        @variables.each_pair { |k, v| puts "#{k} = #{v}" }
-        puts
+        fp = File.new("Makefile", "w")
+        fp.write "\n"
+        @variables.each_pair { |k, v| fp.write "#{k} = #{v}\n" }
+        fp.write "\n"
         @rules.each do |r| 
-            puts "#{r.name}: #{r.dependencies.join ' '}"
+            fp.write "#{r.name}: #{r.dependencies.join ' '}\n"
             r.compilations.each do |d|
-                puts "\t#{d[:input]} => #{d[:output]}"
+                fp.write "\t$(CC) $(FLAGS) #{d[:input]} #{d[:output]} #{d[:flags]}\n"
             end
             r.commands.each do |cmd|
-                puts "\t#{cmd}"
+                fp.write "\t#{cmd}\n"
             end
-        end    
+            fp.write "\n"
+        end
     end
 end
 
@@ -73,10 +83,9 @@ end
 def compile(*args)
     params = { :flags => [] }
     args.each do |arg|
-        case arg.class
-        when Hash
+        if arg.class == Hash
             arg.each_pair { |k, v| params[k] = v }
-        when Symbol, String
+        elsif [String, Symbol].include? arg.class
             case arg
             when :to_obj, "-c"
                 params[:flags] << "-c"
@@ -92,7 +101,7 @@ def command(*args)
 end
 
 def echo message
-    command "echo '#{message}'"
+    command "@echo '#{message}'"
 end
 
 # Shortcut to create a 'clean: ' rule => clean "*o ~" or clean "*o", "~"

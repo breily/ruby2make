@@ -1,5 +1,5 @@
 #
-#CC=g++
+#CC=gcc
 #FLAGS=-g #-O2
 #
 #hello: hello.o
@@ -12,16 +12,16 @@
 #clean:
 #	rm hello *.o;
 
-vars :CC => "g++", :FLAGS => "-g"
+vars :CC => "gcc", :FLAGS => "-g"
 
-rule "hello", :depend => "hello.o" do
+rule "hello", :depends => "hello.o" do
     compile :output => "hello"
     echo "done compiling, run ./hello"
 end
 
 rule "hello.o" do
     depend "hello.c", "hello.h"
-    compile :to_obj, :output => "hello.o"
+    compile :to_obj
 end
 
-clean "hello *.o"
+clean 'hello *.o'

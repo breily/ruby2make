@@ -1,4 +1,40 @@
 Ruby2Make
 ---------
 
-# Hopefully produce a DSL for writing Makefiles from Ruby
+* Goal: Ruby DSL to generate Makefiles
+
+* Status: Pretty much a literal translation right now - though it does
+          sort of work (see below example)
+
+To make this Makefile:
+
+    CC = gcc
+    FLAGS = -g
+
+    hello: hello.o
+        $(CC) $(FLAGS) hello.o -o hello
+        @echo "Run ./hello"
+
+    hello.o: hello.c hello.h
+        $(CC) $(FLAGS) hello.c -c
+
+    clean:
+        -rm hello *.o
+
+Use this script:
+
+    vars :CC => "gcc", :FLAGS => "-g"
+
+    rule "hello", :depends => "hello.o" do
+        compile :output => "hello"
+        echo "Run ./hello"
+    end
+
+    rule "hello.o" do
+        depend "hello.c", "hello.h"
+        compile :to_obj
+    end
+
+    clean "hello", "*.o"
+ 
+It's more readable, and it doesn't insanely require tabs and not spaces.
