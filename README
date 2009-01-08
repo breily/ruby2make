@@ -3,46 +3,43 @@ Ruby2Make
 
 * Goal: Ruby DSL to generate Makefiles
 
-* Status: Pretty much a literal translation right now - though it does
-          sort of work (see below example)
+* Status: Coming along. Can generate most of the Makefiles from my first C class,
+  meaning that it can do simple Makefiles.  But its growing.
 
-To make this Makefile:
+* Simple example: to make this Makefile,
 
     CC = gcc
     FLAGS = -g
 
-    hello: hello.o
-        $(CC) $(FLAGS) hello.o -o hello
-        @echo "Run ./hello"
-
-    hello.o: hello.c hello.h
-        $(CC) $(FLAGS) hello.c -c
+    hello: hello.c
+        $(CC) $(FLAGS) hello.c -o hello
 
     clean:
         -rm hello *.o
 
-Use this script:
+just use this Ruby:
 
-    vars :CC => "gcc", :FLAGS => "-g"
+    vars :FLAGS => "-g"
 
-    rule "hello", :depends => "hello.o" do
+    rule "hello", :depends => "hello.c" do
         compile :output => "hello"
-        echo "Run ./hello"
-    end
-
-    rule "hello.o" do
-        depend "hello.c", "hello.h"
-        compile :to_obj
     end
 
     clean "hello", "*.o"
  
 It's more readable, and it doesn't insanely require tabs and not spaces.
 
+Examples
+--------
+
+* Three example files are included (note that examble2.rb is not complete as
+  I have not implemented the .SUFFIXES macro used).
+
 Syntax
 ------
 
-vars [hash] => Set Makefile macros (includes "gcc" as :CC and "" as :FLAGS)
+vars [hash] 
+    => Set Makefile macros (includes {:CC => "gcc", :FLAGS => ""})
 
 rule [name] [optional depends hash] [block] 
     => Add a rule/target called name. If a hash like ':depends => "hello.o"'
@@ -58,10 +55,10 @@ compile [args]
        with :to_obj. Must occur in a rule block.
 
 command [args]
-    => Add a custom line to a rule.
+    => Add a custom line/command to a rule.
 
 echo [message]
-    => Shortcut to add an '@echo' command.
+    => Shortcut for an often used command: `command "@echo #{message}"`
 
 clean [files]
     => Shortcut to create a clean rule, with a '-rm' command for any [files].

@@ -1,0 +1,6 @@
+
+* Add the .SUFFIXES rule/command
+
+* Make sure commands can accept lists, strings, or symbols
+
+* Make sure all symbols are converted to $(SYMBOL) form
