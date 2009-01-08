@@ -14,17 +14,14 @@
 
 vars :CC => "g++", :FLAGS => "-g"
 
-rule "hello" do
-    depend "hello.o"
-    compile :input => "hello.o", :output => "hello"
+rule "hello", :depend => "hello.o" do
+    compile :output => "hello"
+    echo "done compiling, run ./hello"
 end
 
 rule "hello.o" do
-    depend "hello.cc", "hello.h"
-    compile "hello.cc"
+    depend "hello.c", "hello.h"
+    compile :to_obj, :output => "hello.o"
 end
 
-rule "clean" do
-    command "rm hello *.o"
-end
-
+clean "hello *.o"
