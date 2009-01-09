@@ -133,9 +133,12 @@ def clean(*cmds)
     end
 end
 
-# Add a suffix rule (.SUFFIXES)  Necessary?
-def suffix ext1, ext2
+# Add a suffix rule (.SUFFIXES)
+def suffix ext1, ext2, cmd
     Makefile.instance.suffixes.push [ext1, ext2]
+    rule "#{ext2}#{ext1}" do
+        command cmd
+    end
 end
 
 # Maybe use for shell commands inside rules? (mv, cp, etc)

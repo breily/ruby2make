@@ -42,6 +42,10 @@ It's more readable, and it doesn't insanely require tabs and not spaces.
 vars [hash] 
     => Set Makefile macros (includes {:CC => "gcc", :FLAGS => ""})
 
+suffix [out extension] [in extension] [command]
+    => Add a rule to compile files from the inextension to the out extension,
+       currently using a literal compilation command. See example5.rb.
+
 rule [name] [optional depends hash] [block] 
     => Add a rule/target called name. If a hash like ':depends => "hello.o"'
        or ':depends => ["hello.o", "hello.h"]' is present, then those items
