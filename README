@@ -30,7 +30,7 @@ It's more readable, and it doesn't insanely require tabs and not spaces.
 -=- Examples -=-
 ----------------
 
-* Four examples are included, the fourth with an actual program as its
+* Some examples are included, the fourth with an actual program as its
   Makefile.rb uses Dir.
 
 -=- Syntax -=-

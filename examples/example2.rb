@@ -5,8 +5,6 @@
 #OUTFILE = threadpkg
 #FLAGS = -D__MAKECONTEXT_V2_SOURCE -Wall
 #
-#.SUFFIXES: .o .c
-#
 #all:	$(OFILES)
 #	$(CC) $(FLAGS) $(OFILES) -o $(OUTFILE)
 #
@@ -27,8 +25,6 @@
 
 vars :OFILES => ["uthread.o", "test_threads.o"], :OUTFILE => "threadpkg", 
      :FLAGS => ["-D__MAKECONTEXT_V2_SOURCE",  "-Wall"]
-
-suffix ".o", ".c"
 
 rule "all", :depends => :OFILES do
     compile :output => :OUTFILE
