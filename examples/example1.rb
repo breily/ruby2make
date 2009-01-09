@@ -11,7 +11,7 @@
 #	$(CC) $(FLAGS) hello.c -c
 #
 #clean:
-#	rm hello *.o;
+#	-rm hello *.o;
 #
 # Use this Ruby:
 
@@ -22,7 +22,7 @@ rule "hello", :depends => "hello.o" do
     echo "Done compiling, run ./hello"
 end
 
-rule "hello.o", :depends => ["hello.c", "hello.h"] do
+rule "hello.o", :d => ["hello.c", "hello.h"] do
     compile :to_obj
 end
 

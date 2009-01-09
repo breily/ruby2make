@@ -1,6 +1,4 @@
 #
-# Makefile for unixshell (414 HW3)
-#
 #CC=gcc
 #
 #OUTFILE=slash

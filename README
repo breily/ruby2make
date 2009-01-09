@@ -17,7 +17,7 @@ Ruby2Make
     clean:
         -rm hello *.o
 
-just use this Ruby:
+use this Ruby:
 
     vars :FLAGS => "-g"
 
