@@ -7,5 +7,4 @@
 
 * method_missing for shell commands?
 
-* Add a :suffix param to rule generation and add the appropriate ".SUFFIXES"
-  line
+* Figure out a better form of the suffix rule than using a literal command 

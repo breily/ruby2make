@@ -4,9 +4,6 @@
 
 * Goal: Ruby DSL to generate Makefiles
 
-* Status: Coming along. Can generate most of the Makefiles from my first C class,
-  meaning that it can do simple Makefiles.  But its growing.
-
 * Simple example: to make this Makefile,
 
     CC = gcc
