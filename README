@@ -1,5 +1,6 @@
-Ruby2Make
----------
+
++-+ Ruby2Make +-+
+=================
 
 * Goal: Ruby DSL to generate Makefiles
 
@@ -29,14 +30,14 @@ use this Ruby:
  
 It's more readable, and it doesn't insanely require tabs and not spaces.
 
-Examples
---------
+-=- Examples -=-
+----------------
 
-* Three example files are included (note that examble2.rb is not complete as
-  I have not implemented the .SUFFIXES macro used).
+* Four examples are included, the fourth with an actual program as it's
+  Makefile.rb uses Dir.
 
-Syntax
-------
+-=- Syntax -=-
+--------------
 
 vars [hash] 
     => Set Makefile macros (includes {:CC => "gcc", :FLAGS => ""})

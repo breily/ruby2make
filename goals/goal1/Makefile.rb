@@ -1,52 +1,52 @@
 #
-#CC=gcc
+# Makefile for slash
 #
-#OUTFILE=slash
+#CC = gcc
+#RL_FLAG = -lreadline
+#FLAGS = -Wall
+#OUTFILE = slash
 #
-#OFILES=exit_shell.o error.o init.o file.o options.o eval.o help.o aliases.o environ.o redirect.o globbing.o builtins.o parse.o prompt.o shell.o
+#OFILES = build/aliases.o build/bg.o build/builtin.o  \
+#         build/environ.o build/error.o build/eval.o  \
+#         build/globbing.o build/help.o build/init.o  \
+#         build/input.o build/options.o build/parser.o \
+#         build/prompt.o build/redir.o build/slash.o
 #
-#.SUFFIXES: .o .c
+#all: build/ slash
 #
 #slash:	$(OFILES)
-#	$(CC) $(OFILES) -o $(OUTFILE)
+#	$(CC) $(RL_FLAG) $(FLAGS) $(OFILES) -o $(OUTFILE)
 #
-#unixshell:	$(OFILES)
-#	$(CC) $(OFILES) -o unixshell
+#build/:
+#	mkdir build/
+#
+#build/%.o: src/%.c
+#	$(CC) -c -o $@ $(FLAGS) $<
 #
 #clean:
-#	rm -f *.o
+#	-rm -rf build/
 #
-#exit_shell.o: exit_shell.c exit_shell.h
-#error.o: error.c error.h
-#init.o: init.c init.h
-#file.o: file.c file.h
-#options.o: options.c options.h
-#eval.o: eval.c eval.h
-#help.o: help.c help.h
-#aliases.o: aliases.c aliases.h
-#environ.o: environ.c environ.h
-#redirect.o: redirect.c redirect.h
-#globbing.o: globbing.c globbing.h
-#builtins.o: builtins.c builtins.h
-#parse.o: parse.c parse.h
-#prompt.o: prompt.c prompt.h
-#shell.o: shell.c prompt.c prompt.h parse.c parse.h builtins.c builtins.h globbing.c globbing.o redirect.c redirect.h environ.c environ.h aliases.c aliases.h help.c help.h eval.c eval.h options.c options.h file.c file.h init.c init.h error.c error.h exit_shell.c exit_shell.h
-#
-# Working on the Ruby version...
+# Working on Ruby version.
 
-vars :OUTFILE => "slash", 
-     :OFILES => Dir['*.c'].collect { |f| f.rpartition('.').first + '.o' }
+vars :RL_FLAG => "-lreadline", :FLAGS => "-Wall", :OUTFILE => "slash",
+     :OFILES => Dir['src/*.c'].collect { |f| 
+        "build/" + f.split('/').last.rpartition('.').first + '.o' 
+     }
+# better way than that block?
 
-# Damn suffix rule again
+rule :all, :depends => ["build/", "slash"]
 
-rule :slash, :depend => :OFILES do
-    compile :output => :OUTFILE
+rule :slash, :depends => :OFILES do
+    compile :RL_FLAG, :output => :OUTFILE
 end
 
-rule :unixshell, :depend => :OFILES do
-    compile :output => "unixshell"
+rule "build/" do
+    command "mkdir build/"
 end
 
-clean '*.o'
+rule "build/%.o", :d => "src/%.c" do
+    # needs some work with special macros
+    compile :to_obj, "$<", :output => "$@"
+end
 
-# .....
+clean "-rf build/"

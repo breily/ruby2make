@@ -1,6 +1,4 @@
 
-* Add the .SUFFIXES rule/command
-
 * Figure out a good way to include lots of files (as in both goals)
   - Perhaps just use normal Ruby:
         vars :OFILES => Dir['*.o']

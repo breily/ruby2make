@@ -1,6 +1,6 @@
 require 'singleton'
 
-# Classes
+# -=- Classes -=-
 
 class Rule
     attr_reader :name, :dependencies, :compilations, :commands
@@ -37,9 +37,10 @@ end
 
 class Makefile
     include Singleton
-    attr_accessor :variables, :rules, :current_rule
+    attr_accessor :variables, :suffixes, :rules, :current_rule
     def initialize
         @variables = { :CC => "gcc", :FLAGS => "", :SHELL => "/bin/sh" }
+        @suffixes = []
         @rules = []
         @current_rule = nil
     end
@@ -50,6 +51,10 @@ class Makefile
             v = v.collect { |i| symbol2macro i }.join " " if v.respond_to? :join
             fp.write "#{k} = #{v}\n"
         end
+        @suffixes.each do |s|
+            fp.write "\n"
+            fp.write ".SUFFIXES: #{s[0]} #{s[1]}\n"
+        end    
         @rules.each do |r| 
             fp.write "\n"
             fp.write "#{r.name}: #{r.dependencies.join ' '}\n"
@@ -64,7 +69,7 @@ class Makefile
     end
 end
 
-# DSL Methods
+# -=- DSL Methods -=-
 
 def vars var_dict
     var_dict.each_pair { |k, v| Makefile.instance.variables[k] = v }
@@ -128,11 +133,12 @@ def clean(*cmds)
     end
 end
 
-# Add a suffix rule (.SUFFIXES)
+# Add a suffix rule (.SUFFIXES)  Necessary?
 def suffix ext1, ext2
-    puts "adding suffix rule"
+    Makefile.instance.suffixes.push [ext1, ext2]
 end
-# Utility
+
+#  -=- Utility -=-
 
 # Transforms a symbol into Make's macro form
 def symbol2macro sym
@@ -143,7 +149,7 @@ def symbol2macro sym
     end
 end
 
-# Load files
+# -=- Run -=-
 if ARGV.length == 0
     load 'Makefile.rb'
 else
