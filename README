@@ -63,4 +63,5 @@ echo [message]
     => Shortcut for an often used command: `command "@echo #{message}"`
 
 clean [files]
-    => Shortcut to create a clean rule, with a '-rm' command for any [files].
+    => Shortcut to create a clean rule, with a '-rm -rf' command for all file
+       arguments given.

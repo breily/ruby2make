@@ -1,5 +1,4 @@
 #
-# Makefile for slash
 #
 #CC = gcc
 #RL_FLAG = -lreadline

@@ -124,12 +124,8 @@ def echo message; command "@echo '#{message}'"; end
 
 # Shortcut to create a 'clean: ' rule => clean "*o ~" or clean "*o", "~"
 def clean(*cmds)
-    if cmds.respond_to? :join
-        tmp_cmds = cmds.collect { |c| symbol2macro c }
-        cmds = tmp_cmds.join " "
-    end
     rule "clean" do
-        command "-rm #{cmds}"
+        cmds.each { |c| command "-rm -rf #{symbol2macro c}" }   
     end
 end
 
