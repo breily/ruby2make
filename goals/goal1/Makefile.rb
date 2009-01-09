@@ -34,7 +34,8 @@
 #
 # Working on the Ruby version...
 
-vars :OUTFILE => "slash", :OFILES => "ex....."
+vars :OUTFILE => "slash", 
+     :OFILES => Dir['*.c'].collect { |f| f.rpartition('.').first + '.o' }
 
 # Damn suffix rule again
 

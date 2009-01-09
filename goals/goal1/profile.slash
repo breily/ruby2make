@@ -1,0 +1,11 @@
+alias   rm  'rm -iv'
+alias   cp  'cp -i'
+alias   mv  'mv -i'
+alias   ..  'cd ..'
+alias   v   'vim'
+alias   lz  'ls -lFGh'
+
+alias   psi 'ps -o pid,ppid,pgid,sess,tpgid,command'
+
+set @ls_command 'ls -F'
+alias   ls  'ls -F'

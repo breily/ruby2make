@@ -21,18 +21,18 @@
 #	mkdir build/
 #
 #build/%.o: src/%.c
-#	@echo "gcc $*.c"
-#	@$(CC) -c -o $@ $(FLAGS) $<
+#	$(CC) -c -o $@ $(FLAGS) $<
 #
 #clean:
-#	rm -f build/*.o
-#	rm -df build/
+#	-rm -rf build/
 #
 # Working on Ruby version.
 
-vars :RL_FLAG => "-lreadline", :FLAGS => "-Wall", :OUTFILE => "slash"
-
-# Gotta be a good way not to have to type all that; maybe use Dir["build/*.o"]
+vars :RL_FLAG => "-lreadline", :FLAGS => "-Wall", :OUTFILE => "slash",
+     :OFILES => Dir['src/*.c'].collect { |f| 
+        "build/" + f.split('/').last.rpartition('.').first + '.o' 
+     }
+# better way than that block?
 
 rule :all, :depends => ["build/", "slash"]
 
@@ -40,4 +40,13 @@ rule :slash, :depends => :OFILES do
     compile :RL_FLAG, :output => :OUTFILE
 end
 
-# .....
+rule "build/" do
+    command "mkdir build/"
+end
+
+rule "build/%.o", :d => "src/%.c" do
+    # needs some work with special macros
+    compile :to_obj, "$<", :output => "$@"
+end
+
+clean "-rf build/"

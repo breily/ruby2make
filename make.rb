@@ -39,7 +39,7 @@ class Makefile
     include Singleton
     attr_accessor :variables, :rules, :current_rule
     def initialize
-        @variables = { :CC => "gcc", :FLAGS => "" }
+        @variables = { :CC => "gcc", :FLAGS => "", :SHELL => "/bin/sh" }
         @rules = []
         @current_rule = nil
     end
@@ -128,6 +128,10 @@ def clean(*cmds)
     end
 end
 
+# Add a suffix rule (.SUFFIXES)
+def suffix ext1, ext2
+    puts "adding suffix rule"
+end
 # Utility
 
 # Transforms a symbol into Make's macro form
