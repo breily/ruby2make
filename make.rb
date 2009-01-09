@@ -23,7 +23,7 @@ class Rule
         params[:input] = [params[:input]].flatten.join " "
         # Find the output file, if any
         if params[:output].nil?
-            params[:output] = ""
+            params[:output] = "-o $@"
         else
             params[:output] = "-o #{params[:output]}"
         end

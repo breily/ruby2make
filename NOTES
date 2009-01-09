@@ -1,0 +1,8 @@
+*** Special Macros:
+    $@      => Name of file to be made (current target name)
+    $?      => Names of dependencies newer than target
+    $^      => Names of all dependencies (no duplicates)
+    $+      => Names of all dependencies (with duplicates)
+    $<      => Name of the first dependency
+    $*      => The part matched from a '%' in the target name
+    $>      => ?
