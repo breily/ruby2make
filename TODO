@@ -4,3 +4,8 @@
         vars :OFILES => Dir['*.o']
 
 * Special macros - $@, $<, etc
+
+* method_missing for shell commands?
+
+* Add a :suffix param to rule generation and add the appropriate ".SUFFIXES"
+  line

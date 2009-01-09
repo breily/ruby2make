@@ -23,12 +23,12 @@
 #uthread.o: uthread.c uthread.h
 #main.o: main.c uthread.c uthread.h
 #
-# Work in progress...
+# Use this Ruby:
 
 vars :OFILES => ["uthread.o", "test_threads.o"], :OUTFILE => "threadpkg", 
      :FLAGS => ["-D__MAKECONTEXT_V2_SOURCE",  "-Wall"]
 
-# Add suffix rule here
+suffix ".o", ".c"
 
 rule "all", :depends => :OFILES do
     compile :output => :OUTFILE

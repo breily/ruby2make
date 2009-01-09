@@ -138,6 +138,11 @@ def suffix ext1, ext2
     Makefile.instance.suffixes.push [ext1, ext2]
 end
 
+# Maybe use for shell commands inside rules? (mv, cp, etc)
+def method_missing(*args)
+    puts "** not implemented"
+end
+
 #  -=- Utility -=-
 
 # Transforms a symbol into Make's macro form
