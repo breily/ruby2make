@@ -27,6 +27,15 @@ use this Ruby:
  
 It's more readable, and it doesn't insanely require tabs and not spaces.
 
+-=- Usage -=-
+-------------
+
+* To install in /usr/bin, do `ruby setup.rb` as root.
+
+* To use, `rbmake` looks for a Makefile.rb and generates a Makefile.
+
+* To specify a Makefile.rb, use `rbmake other_file.rb`.
+
 -=- Examples -=-
 ----------------
 
