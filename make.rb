@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require 'singleton'
 
 # -=- Classes -=-
@@ -104,10 +106,13 @@ def compile(*args)
             # Compile to object code
             when :to_obj, "-c"
                 params[:flags].push "-c"
+            # If we don't recognize just add it to the string    
             when
                 # Transform args like :MACRO into $(MACRO)
                 if arg.class == Symbol
                     params[:flags].push "$(#{arg})"
+                else
+                    params[:flags].push arg
                 end
             end
         end
@@ -155,7 +160,11 @@ end
 
 # -=- Run -=-
 if ARGV.length == 0
-    load 'Makefile.rb'
+    if File.exists? 'Makefile.rb'
+        load 'Makefile.rb'
+    else
+        puts '** no Makefile.rb found'
+    end    
 else
     load ARGV[0]
 end
