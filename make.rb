@@ -145,7 +145,10 @@ def command(*args)
     args.each { |arg| Makefile.instance.current_rule.command arg }
 end
 # Shortcut for 'echo' command
-def echo message; command "@echo '#{message}'"; end
+def echo *message
+    msg = message.collect { |m| symbol2macro m }.join " "
+    command "@echo '#{msg}'"
+end
 
 # Shortcut to create a 'clean: ' rule => clean "*o ~" or clean "*o", "~"
 def clean(*cmds)
