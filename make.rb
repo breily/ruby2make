@@ -2,7 +2,7 @@
 
 require 'singleton'
 
-# -=- Classes -=-
+# -= ~ =-   Classes   -= ~ =-
 
 class Rule
     attr_reader :name, :comments, :dependencies, :compilations, :commands
@@ -81,7 +81,7 @@ class Makefile
     end
 end
 
-# -=- DSL Methods -=-
+# -= ~ =-   DSL Methods   -= ~ =-
 
 def vars var_dict
     var_dict.each_pair { |k, v| Makefile.instance.variables[k] = v }
@@ -170,7 +170,7 @@ def method_missing(*args)
     puts "** not implemented"
 end
 
-#  -=- Utility -=-
+#  -= ~ =-   Utility   -= ~ =-
 
 # Transforms a symbol into Make's macro form
 def symbol2macro sym
@@ -181,7 +181,8 @@ def symbol2macro sym
     end
 end
 
-# -=- Run -=-
+# -= ~ =-   Run   -= ~ =-
+
 if ARGV.length == 0
     if File.exists? 'Makefile.rb'
         load 'Makefile.rb'
