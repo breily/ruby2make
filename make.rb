@@ -29,11 +29,13 @@ class Rule
         params[:input] = [params[:input]].flatten.join " "
         # Find the output file, if any
         if params[:output].nil?
-            params[:output] = "-o $@"
+            params[:output] = ""
         else
             params[:output] = "-o #{params[:output]}"
         end
         params[:flags] = params[:flags].join " "
+        # Find the compiler
+        params[:compiler] = "$(CC)" if params[:compiler].nil?
         @compilations.push params
     end
     def command(arg)
@@ -70,7 +72,8 @@ class Makefile
             r.comments.each { |c| fp.write "# #{c}\n" }
             fp.write "#{r.name}: #{r.dependencies.join ' '}\n"
             r.compilations.each do |d|
-                fp.write "\t$(CC) $(FLAGS) #{d[:flags]} #{d[:input]} #{d[:output]}\n"
+                fp.write "\t#{d[:compiler]} $(FLAGS) #{d[:flags]}"
+                fp.write " #{d[:input]} #{d[:output]}\n"
             end
             r.commands.each do |cmd|
                 fp.write "\t#{cmd}\n"
@@ -120,7 +123,15 @@ def compile(*args)
     params = { :flags => [] }
     args.each do |arg|
         if arg.class == Hash
-            arg.each_pair { |k, v| params[k] = symbol2macro v }
+            arg.each_pair do |k, v|
+                if [:input, :i].include? k
+                    params[:input] = symbol2macro v
+                elsif [:output, :o].include? k
+                    params[:output] = symbol2macro v
+                elsif [:compiler, :c].include? k
+                    params[:compiler] = symbol2macro v
+                end
+            end
         elsif [String, Symbol].include? arg.class
             case arg
             # Compile to object code
@@ -167,7 +178,7 @@ end
 
 # Maybe use for shell commands inside rules? (mv, cp, etc)
 def method_missing(*args)
-    puts "** not implemented"
+    puts "** not implemented [#{args}]"
 end
 
 #  -= ~ =-   Utility   -= ~ =-
@@ -190,7 +201,13 @@ if ARGV.length == 0
         puts '** no Makefile.rb found'
     end    
 else
-    load ARGV[0]
+    if ["-v", "--version"].include? ARGV[0]
+        puts "ruby2make version 0.0.1\n"
+    elsif ["-h", "--help"].include? ARGV[0]
+        puts "usage: rbmake [ -v | -h | filename ]\n"
+    else    
+        load ARGV[0]
+    end    
 end
 Makefile.instance.render
 

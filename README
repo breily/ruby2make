@@ -65,6 +65,9 @@ compile [args]
        :input and :output specify specific files, and you can add a '-c' flag
        with :to_obj. Must occur in a rule block.
 
+       New:  Use :compiler to specify a different compilation program (see
+       example5.rb for usage).
+
 command [args]
     => Add a custom line/command to a rule.
 
