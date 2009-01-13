@@ -13,15 +13,9 @@ class Rule
         @compilations = []  # list of hashes
         @commands = []      # list of strings
     end
-    def comment(arg)
-        @comments.push arg
-    end
-    def depend(arg)
-        @dependencies.push arg
-    end
-    def command(arg)
-        @commands.push arg
-    end
+    def comment(arg); @comments.push arg;     end
+    def depend(arg);  @dependencies.push arg; end
+    def command(arg); @commands.push arg;     end
     def compile(params={})
         # Find the input files for the compile command (usually dependencies)
         deps = @dependencies.find_all { |d| d.split('.').last != 'h' unless d.nil? }

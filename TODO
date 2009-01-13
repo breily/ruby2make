@@ -14,3 +14,5 @@
 * Fix rules so that commands/compiles/etc in rules occur in the same order as
   specified in the Makefile.rb (they currently don't, as compiles have a higher
   priority)
+
+* Clean up code, its messy
