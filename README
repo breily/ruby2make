@@ -1,4 +1,5 @@
 
+
 +~^~+ Ruby2Make +~^~+
 =====================
 
@@ -13,7 +14,8 @@
         $(CC) $(FLAGS) hello.c -o hello
 
     clean:
-        -rm hello *.o
+        -rm hello 
+        -rm *.o
 
 use this Ruby:
 
@@ -27,6 +29,7 @@ use this Ruby:
  
 It's more readable, and it doesn't insanely require tabs and not spaces.
 
+
 -=- Usage -=-
 -------------
 
@@ -36,11 +39,13 @@ It's more readable, and it doesn't insanely require tabs and not spaces.
 
 * To specify a Makefile.rb, use `rbmake other_file.rb`.
 
+
 -=- Examples -=-
 ----------------
 
-* Some examples are included, the fourth with an actual program as its
-  Makefile.rb uses Dir.
+* A number of usage examples are included, they would be the best way to
+  learn the syntax.
+
 
 -=- Syntax -=-
 --------------
@@ -54,7 +59,7 @@ suffix [out extension] [in extension] [command]
 
 rule [name] [optional depends hash] [block] 
     => Add a rule/target called name. If a hash like ':depends => "hello.o"'
-       or ':depends => ["hello.o", "hello.h"]' is present, then those items
+       or ':depend => ["hello.o", "hello.h"]' is present, then those items
        are added as dependencies to the rule.
 
 depends [args]
@@ -62,17 +67,24 @@ depends [args]
 
 compile [args]
     => Without any args, uses '$(CC) $(FLAGS)' to compile the dependencies.
-       :input and :output specify specific files, and you can add a '-c' flag
-       with :to_obj. Must occur in a rule block.
 
-       New:  Use :compiler to specify a different compilation program (see
-       example5.rb for usage).
+       Parameters accepted:
+         :input, :i         => Specify input file(s)
+         :output, :o        => Specify output file
+         :compiler, :c      => Specify a compiler other than $(CC)
+         :to_obj, :obj      => Add a "-c" flag
+         :to_asm, :asm      => Add a "-S" flag
+         :debug             => Add a "-g" flag
+         :$@                => Sets the output file to "$@" (name of the rule)
 
-command [args]
+       Literal arguments are also accepted.  Strings are directly inserted, and
+       symbols are converted to macros. :LIBS becomes $(LIBS).
+
+shell [args]
     => Add a custom line/command to a rule.
 
 echo [message]
-    => Shortcut for an often used command: `command "@echo #{message}"`
+    => Shortcut for an often used command: `shell "@echo #{message}"`
 
 clean [files]
     => Shortcut to create a clean rule, with a '-rm -rf' command for all file

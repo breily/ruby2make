@@ -2,48 +2,55 @@
 
 require 'singleton'
 
-# -= ~ =-   Classes   -= ~ =-
+
+# ~~~  Built-in Extensions  ~~~
+
+#   * to_macro converts a Symbol to Make's macro form - $(...)
+#   * is_in is the opposite of [].include?
+
+class Symbol
+    def to_macro;   "$(#{inspect.rpartition(':').last})"; end
+    def is_in(lst); lst.include? self; end
+end
+
+class String
+    def to_macro;   to_s; end
+    def is_in(lst); lst.include? self; end
+    # Used to check if a filename has a header (.h) suffix
+    def has_suffix(str)
+        if self.index(str) and (self.index(str) + str.length == self.length)
+            return true
+        end
+        false
+    end
+end
+
+
+# ~~~  Classes  ~~~
 
 class Rule
-    attr_reader :name, :comments, :dependencies, :compilations, :commands
+    attr_reader :name, :comments, :dependencies, :compilations, :shells
     def initialize(name)
         @name = name
-        @comments = []      # list of strings
+        @comments     = []  # list of strings
         @dependencies = []  # list of strings
         @compilations = []  # list of hashes
-        @commands = []      # list of strings
+        @shells       = []  # list of strings
     end
-    def comment(arg); @comments.push arg;     end
-    def depend(arg);  @dependencies.push arg; end
-    def command(arg); @commands.push arg;     end
-    def compile(params={})
-        # Find the input files for the compile command (usually dependencies)
-        deps = @dependencies.find_all { |d| d.split('.').last != 'h' unless d.nil? }
-        params[:input] = deps if params[:input].nil?
-        # Make it a list again and then flatten it in case it was just one string,
-        # instead of a list
-        params[:input] = [params[:input]].flatten.join " "
-        # Find the output file, if any
-        if params[:output].nil?
-            params[:output] = ""
-        else
-            params[:output] = "-o #{params[:output]}"
-        end
-        params[:flags] = params[:flags].join " "
-        # Find the compiler
-        params[:compiler] = "$(CC)" if params[:compiler].nil?
-        @compilations.push params
-    end
+    def comment(arg);       @comments.push arg;        end
+    def depend(arg);        @dependencies.push arg;    end
+    def shell(arg);         @shells.push arg;          end
+    def compile(params={}); @compilations.push params; end
 end
 
 class Makefile
     include Singleton
     attr_accessor :comments, :variables, :suffixes, :rules, :current_rule
     def initialize
-        @comments = []
-        @variables = { :CC => "gcc", :FLAGS => "", :SHELL => "/bin/sh" }
-        @suffixes = []
-        @rules = []
+        @comments     = []
+        @variables    = { :CC => "gcc", :FLAGS => "" }
+        @suffixes     = []
+        @rules        = []
         @current_rule = nil
     end
     def render
@@ -53,7 +60,7 @@ class Makefile
         end
         fp.write "\n"
         @variables.each_pair do |k, v|
-            v = v.collect { |i| symbol2macro i }.join " " if v.respond_to? :join
+            v = v.collect { |i| i.to_macro }.join " " if v.respond_to? :join
             fp.write "#{k} = #{v}\n"
         end
         @suffixes.each do |s|
@@ -65,10 +72,10 @@ class Makefile
             r.comments.each { |c| fp.write "# #{c}\n" }
             fp.write "#{r.name}: #{r.dependencies.join ' '}\n"
             r.compilations.each do |d|
-                fp.write "\t#{d[:compiler]} $(FLAGS) #{d[:flags]}"
-                fp.write " #{d[:input]} #{d[:output]}\n"
+                fp.write "\t#{d[:c]} $(FLAGS) #{d[:flags]}"
+                fp.write " #{d[:i]} #{d[:o]}\n"
             end
-            r.commands.each do |cmd|
+            r.shells.each do |cmd|
                 fp.write "\t#{cmd}\n"
             end
         end
@@ -76,11 +83,15 @@ class Makefile
         fp.close
     end
 end
+# Shortcut functions
+def mf;  Makefile.instance;              end
+def mfr; Makefile.instance.current_rule; end
 
-# -= ~ =-   DSL Methods   -= ~ =-
+
+# ~~~  DSL Functions  ~~~
 
 def vars var_dict
-    var_dict.each_pair { |k, v| Makefile.instance.variables[k] = v }
+    var_dict.each_pair { |k, v| mf.variables[k] = v }
 end
 
 def rule(name, params={}, &block)
@@ -97,115 +108,94 @@ end
 
 def comment(*args)
     args.each do |c|
-        if Makefile.instance.current_rule.nil?
-            Makefile.instance.comments.push c
-        else
-            Makefile.instance.current_rule.comment c
+        if   mfr.nil? then mf.comments.push c
+        else mfr.comment c
         end
     end
 end
 
 # Add a dependency (or list of them) to the rule
 def depend(*args)
-    args.each { |arg| Makefile.instance.current_rule.depend(symbol2macro(arg)) }
+    args.each { |arg| mfr.depend(arg.to_macro) unless arg.nil? }
 end
 
 # Compilation method, uses val of :CC and :FLAGS
 def compile(*args)
     # List of user-added flags
-    params = { :flags => [] }
+    params = { :flags => [], :o => "", :c => "$(CC)" }
     args.each do |arg|
-        if arg.class == Hash
-            arg.each_pair do |k, v|
-                if [:input, :i].include? k
-                    params[:input] = symbol2macro v
-                elsif [:output, :o].include? k
-                    params[:output] = symbol2macro v
-                elsif [:compiler, :c].include? k
-                    params[:compiler] = symbol2macro v
-                end
+        if arg.class == Hash then arg.each_pair do |k, v|
+               if k.is_in [:input,    :i, "input"   ] then params[:i] = v.to_macro
+            elsif k.is_in [:output,   :o, "output"  ] then params[:o] = v.to_macro
+            elsif k.is_in [:compiler, :c, "compiler"] then params[:c] = v.to_macro
             end
-        elsif [String, Symbol].include? arg.class
+        end
+        else
             case arg
-            # Compile to object code
-            when :obj, :to_obj, "-c"
-                params[:flags].push "-c"
-            # If we don't recognize just add it to the string    
-            when
-                # Transform args like :MACRO into $(MACRO)
-                if arg.class == Symbol
-                    params[:flags].push "$(#{arg})"
-                else
-                    params[:flags].push arg
-                end
+            when :to_obj, :obj, "-c"; params[:flags].push "-c"
+            when :to_asm, :asm, "-S"; params[:flags].push "-S"
+            when :debug, "-g";        params[:flags].push "-g"
+            when :out, :o, :$@, "$@"; params[:o] = "$@"
+            else                      params[:flags].push arg.to_macro
             end
         end
     end
-    Makefile.instance.current_rule.compile params
+    if params[:i].nil?
+        # Add the rule's dependencies as inputs
+        params[:i] = mfr.dependencies.find_all { |d| not d.has_suffix(".h") }
+    else
+        # Turn an individual string into a list
+        params[:i] = [params[:i]].flatten.join " "
+    end
+    params[:o] = "-o #{params[:o]}" unless params[:o] == ""
+    params[:flags] = params[:flags].join " "
+    mfr.compile params
 end
 
 # Add shell commands
-def command(*args)
-    args.each { |arg| Makefile.instance.current_rule.command arg }
+def shell(*args)
+    args.each { |arg| mfr.shell arg }
 end
 # Shortcut for 'echo' command
 def echo *message
-    msg = message.collect { |m| symbol2macro m }.join " "
-    command "@echo '#{msg}'"
+    msg = message.collect { |m| m.to_macro }.join " "
+    shell "@echo '#{msg}'"
 end
 
 # Shortcut to create a 'clean: ' rule => clean "*o ~" or clean "*o", "~"
 def clean(*cmds)
     rule "clean" do
-        cmds.each { |c| command "-rm -rf #{symbol2macro c}" }   
+        cmds.each { |c| shell "-rm -rf #{c.to_macro}" }   
     end
 end
 
 # Add a suffix rule (.SUFFIXES)
 def suffix ext1, ext2, cmd
-    Makefile.instance.suffixes.push [ext1, ext2]
+    mf.suffixes.push [ext1, ext2]
     rule "#{ext2}#{ext1}" do
-        command cmd
+        shell cmd
     end
 end
 
-# Maybe use for shell commands inside rules? (mv, cp, etc)
-def method_missing(*args)
-    puts "** not implemented [#{args}]"
-end
 
-#  -= ~ =-   Utility   -= ~ =-
-
-# Transforms a symbol into Make's macro form
-def symbol2macro sym
-    if sym.class == Symbol
-        "$(#{sym})"
-    else
-        sym
-    end
-end
-
-# -= ~ =-   Run   -= ~ =-
+# ~~~  Run  ~~~
 
 if ARGV.length == 0
-    if File.exists? 'Makefile.rb'
-        load 'Makefile.rb'
-    elsif File.exists? 'makefile.rb'
-        load 'makefile.rb'
+    if mfile = Dir['*'].grep(/makefile.rb/i)[0]
+        load mfile
     else
         puts '** no Makefile.rb found'
     end    
 else
-    if ["-v", "--version"].include? ARGV[0]
-        puts "ruby2make version 0.0.1\n"
-    elsif ["-h", "--help"].include? ARGV[0]
-        puts "usage: rbmake [ -v | -h | filename ]\n"
-    else    
-        load ARGV[0]
-    end    
+    ARGV.each do |arg|
+        case arg
+        when "-v", "-version", "--version"
+            puts "ruby2make version 0.1.1"
+        when "-h", "-help", "--help"
+            puts "usage: rbmake [ -v | -h | filename ]\n"
+        when /.*/
+            load arg
+        end    
+    end
 end
-Makefile.instance.render
-
-# Add a command line option to either call `make` or not
-# Hmm, call by default or not?
-# system "make"
+mf.render

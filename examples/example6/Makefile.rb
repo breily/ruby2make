@@ -21,15 +21,15 @@
 vars :CC => "g++", :FLAGS => "-g -DLINUX", :LIBS => "-lpthread"
 
 rule "philosophers", :d => "philosophers.o" do
-    compile :LIBS
+    compile :LIBS, :$@
 end
 
 rule "philosophers.o", :d => ["philosophers.h", "philosophers.cpp"] do
-    compile :to_obj
+    compile :to_obj, :o => "$@"
 end
 
 rule "philosophers_stats", :d => "philosophers_stats.cpp" do
-    compile :LIBS
+    compile :LIBS, :o => "$@"
 end
 
 clean "*.o", "philosophers", "philosophers_stats"
