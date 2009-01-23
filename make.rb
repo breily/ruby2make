@@ -154,6 +154,11 @@ end
 
 # Add shell commands
 def shell(*args)
+    ######################################################### Start working here
+    #buf = ""
+    #args.each do |arg|
+    #    case arg
+    #    when :silent;   buf
     args.each { |arg| mfr.shell arg }
 end
 # Shortcut for 'echo' command
@@ -198,4 +203,5 @@ else
         end    
     end
 end
+
 mf.render

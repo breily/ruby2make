@@ -15,4 +15,3 @@
   specified in the Makefile.rb (they currently don't, as compiles have a higher
   priority)
 
-* Clean up code, its messy
