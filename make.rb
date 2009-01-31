@@ -132,10 +132,10 @@ def compile(*args)
         end
         else
             case arg
-            when :to_obj, :obj, "-c"; params[:flags].push "-c"
-            when :to_asm, :asm, "-S"; params[:flags].push "-S"
-            when :debug, "-g";        params[:flags].push "-g"
-            when :out, :o, :$@, "$@"; params[:o] = "$@"
+            when :to_obj, :obj, "-c" then params[:flags].push "-c"
+            when :to_asm, :asm, "-S" then params[:flags].push "-S"
+            when :debug, "-g";       then params[:flags].push "-g"
+            when :out, :o, :$@, "$@" then params[:o] = "$@"
             else                      params[:flags].push arg.to_macro
             end
         end
@@ -154,12 +154,15 @@ end
 
 # Add shell commands
 def shell(*args)
-    ######################################################### Start working here
-    #buf = ""
-    #args.each do |arg|
-    #    case arg
-    #    when :silent;   buf
-    args.each { |arg| mfr.shell arg }
+    buf = ""
+    args.each do |arg|
+        case arg
+        when :silent   then buf = "@" + buf
+        when :suppress then buf = "-" + buf
+        else                buf += arg
+        end
+    end
+    mfr.shell buf
 end
 # Shortcut for 'echo' command
 def echo *message
@@ -170,7 +173,7 @@ end
 # Shortcut to create a 'clean: ' rule => clean "*o ~" or clean "*o", "~"
 def clean(*cmds)
     rule "clean" do
-        cmds.each { |c| shell "-rm -rf #{c.to_macro}" }   
+        cmds.each { |c| shell "-rm -rf #{c.to_macro}" }
     end
 end
 
@@ -194,12 +197,9 @@ if ARGV.length == 0
 else
     ARGV.each do |arg|
         case arg
-        when "-v", "-version", "--version"
-            puts "ruby2make version 0.1.1"
-        when "-h", "-help", "--help"
-            puts "usage: rbmake [ -v | -h | filename ]\n"
-        when /.*/
-            load arg
+        when "-v", "-version", "--version" then puts "ruby2make version 0.1.1"
+        when "-h", "-help", "--help" then puts "rbmake [ -v | -h | filename ]"
+        when /.*/ then load arg
         end    
     end
 end
