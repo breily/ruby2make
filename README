@@ -82,6 +82,9 @@ compile [args]
 
 shell [args]
     => Add a custom line/command to a rule.
+       Modifiers allowed:
+        :silent     => Add a '@' to command (Make won't echo it when it executes)
+        :suppress   => Add a '-' to command (Make won't worry about errors)
 
 echo [message]
     => Shortcut for an often used command: `shell "@echo #{message}"`
