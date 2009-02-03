@@ -135,7 +135,7 @@ def compile(*args)
             when :to_obj, :obj, "-c" then params[:flags].push "-c"
             when :to_asm, :asm, "-S" then params[:flags].push "-S"
             when :debug, "-g";       then params[:flags].push "-g"
-            when :out, :o, :$@, "$@" then params[:o] = "$@"
+            when :$@, "$@"           then params[:o] = "$@"
             else                      params[:flags].push arg.to_macro
             end
         end
@@ -197,7 +197,7 @@ if ARGV.length == 0
 else
     ARGV.each do |arg|
         case arg
-        when "-v", "-version", "--version" then puts "ruby2make version 0.1.1"
+        when "-v", "-version", "--version" then puts "ruby2make version 0.1.2"
         when "-h", "-help", "--help" then puts "rbmake [ -v | -h | filename ]"
         when /.*/ then load arg
         end    
