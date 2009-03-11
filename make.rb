@@ -73,7 +73,7 @@ class Makefile
             fp.write "#{r.name}: #{r.dependencies.join ' '}\n"
             r.compilations.each do |d|
                 fp.write "\t#{d[:c]} $(FLAGS) #{d[:flags]}"
-                fp.write " #{d[:i]} #{d[:o]}\n"
+                fp.write " #{d[:i].join ' '} #{d[:o]}\n"
             end
             r.shells.each do |cmd|
                 fp.write "\t#{cmd}\n"
