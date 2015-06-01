@@ -2,7 +2,6 @@
 
 require 'singleton'
 
-
 # ~~~  Built-in Extensions  ~~~
 
 #   * to_macro converts a Symbol to Make's macro form - $(...)
@@ -24,7 +23,6 @@ class String
         false
     end
 end
-
 
 # ~~~  Classes  ~~~
 
