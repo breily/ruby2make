@@ -1,5 +1,4 @@
 
-
 +~^~+ Ruby2Make +~^~+
 =====================
 
@@ -97,3 +96,4 @@ comment [comments]
     => When used outside a rule, adds the comment at the beginning of the 
        Makefile.  When used inside a rule, adds the comments directly above
        the rule (see example 1).
+
