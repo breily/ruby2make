@@ -1,5 +1,4 @@
 #
-#
 #CC = gcc
 #RL_FLAG = -lreadline
 #FLAGS = -Wall
@@ -20,10 +19,12 @@
 #	mkdir build/
 #
 #build/%.o: src/%.c
-#	$(CC) -c -o $@ $(FLAGS) $<
+#   @echo "gcc $*.c"
+#	@$(CC) -c -o $@ $(FLAGS) $<
 #
 #clean:
-#	-rm -rf build/
+#	-rm -f build/*.o
+#   -rm -df build/
 #
 # Working on Ruby version.
 
@@ -43,9 +44,11 @@ rule "build/" do
     command "mkdir build/"
 end
 
+# needs some work with special macros
 rule "build/%.o", :d => "src/%.c" do
-    # needs some work with special macros
+    command "echo \"gcc $*.c\""
     compile :to_obj, "$<", :output => "$@"
 end
 
-clean "-rf build/"
+clean "-f build/*.o"
+clean "-df build/"
